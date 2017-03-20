@@ -5,4 +5,4 @@ http://ja.googology.wikia.com/wiki/%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%83%96
 
 ## Talk with me at
 * http://twitter.com/koteitan/
-* kiwiirc.com/client/irc.freenode.net/##googology
+* http://kiwiirc.com/client/irc.freenode.net/##googology
