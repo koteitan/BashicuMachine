@@ -1,5 +1,49 @@
 window.onload=function(){ //entry point
+  //display code
+  document.getElementById('code').innerHTML="";
+  for(var i=0;i<cmds;i++){
+    var str=list[i][1].replace(/\s/g,'&nbsp');
+    document.getElementById('code').innerHTML+="<span id=cmd"+i+">"+str+"</span>";
+  }
+  //init
+  init();
+};
+
+var pc;
+var init=function(){
+  pc=0;
+  var pcci=pc2cmd(pc);
+  hilight(pcci);
+};
+
+var pc2cmd=function(_pc){
+  var ci;
+  for(ci=0;ci<cmds;ci++){
+    if(list[ci][0]==_pc) return ci;
+  }
+  if(ci==cmds) return null;
+};
+
+var step1=function(){
+  //find cmd at pc pc
+  pc++;
+  var pcci=pc2cmd(pc);
+  if(pcci!=null){
+    hilight(pcci);
+  }else{
+    init();
+  }
 }
+
+var hilight=function(_ci){
+  for(ci=0;ci<_ci;ci++){
+    document.getElementById('cmd'+ci).style="";
+  }
+  document.getElementById('cmd'+_ci).style="color:white;background-color:red";
+  for(ci=_ci+1;ci<cmds;ci++){
+    document.getElementById('cmd'+ci).style="";
+  }
+};
 
 /* pseudo-asm code
   command:
@@ -32,7 +76,7 @@ var list=[
   [2,'for E=0 to 9<br>'                 ,['lpu','E',0,9,1]],
   [3,' for F=0 to A<br>'                ,['lpu','F',0,'A']],
   [4,'  B[1,F]=1:'                      ,['mov','w','B',1,'F',1]], 
-  [5,'  C[1,F]=1<br>'                   ,['mov','w','C',1,'F',1]], 
+  [5,'C[1,F]=1<br>'                   ,['mov','w','C',1,'F',1]], 
   [6,' next<br>'                        ,['lpo']],
   [7,' for G=1 to 0 step -1<br>'        ,['lpu','G',1,0,-1]],
   [8,'  A=A*A<br>'                      ,['mov','A','*','A','A']],
@@ -43,17 +87,17 @@ var list=[
   [15,'&lt;'                            ,['mov','X','<','X','Y']],
   [13,'B[G,I]'                          ,['mov','Y','r','B','G','I']],
   [14,'-D[I] '                          ,['mov','X','-','Y','r','D','I',0]],
-  [17,'|'                               ,['mov','X','|','X','Y']],
-  [16,'B[G,1]=0'                        ,['mov','Y','==','r','B','G',1,0]],
+  [17,'| '                               ,['mov','X','|','X','Y']],
+  [16,'B[G,1]=0 '                        ,['mov','Y','==','r','B','G',1,0]],
   [18,'then<br>'                        ,['cnj','X',19,28]],
-  [19,'     if'                         ,['nop']],
-  [20,'B[G,I+1]=0'                      ,['mov','w','B','G','+','I',1,0]],
+  [19,'     if '                        ,['nop']],
+  [20,'B[G,I+1]=0 '                     ,['mov','w','B','G','+','I',1,0]],
   [21,'then'                            ,['cnj','X',22,25]],
   [22,' I=F:'                           ,['mov','I','F']],
   [23,'J=H:'                            ,['mov','J','H']],
-  [24,'H=G'                             ,['mov','H','G']],
-  [24,'else'                            ,['jmp',27]],
-  [25,' D[I]=B[G,I]-B[G-H,I]<br>'       ,['mov','w','D','I',0,'-','r','B','G','I','r','B','-','G','H','I']],
+  [24,'H=G '                            ,['mov','H','G']],
+  [25,'else '                            ,['jmp',27]],
+  [26,'D[I]=B[G,I]-B[G-H,I]<br>'       ,['mov','w','D','I',0,'-','r','B','G','I','r','B','-','G','H','I']],
   [27,'    else<br>'                    ,['jmp',29]],
   [28,'     I=F<br>'                    ,['mov','I','F']],
   [29,'    endif<br>'                   ,['nop']],
@@ -64,7 +108,7 @@ var list=[
   [34,'    if '                         ,['nop']],
   [35,'B[G-J+L,0]'                      ,['mov','X','r','B','+','-','G','J','L',0]],
   [37,'&lt;'                            ,['mov','X','X','Y']],
-  [36,'B[G-J+K,0]' ,                    ,['mov','Y','r','B','+','-','G','J','K',0]],
+  [36,'B[G-J+K,0] ' ,                    ,['mov','Y','r','B','+','-','G','J','K',0]],
   [38,'then<br>'                        ,['cnj','X',39,52]],
   [39,'     for M=0 to F<br>'           ,['lpu','M',0,'F']],
   [40,'      if '                       ,['nop']],
@@ -74,8 +118,8 @@ var list=[
   [45,'&amp;'                           ,['mov','X','&','X','Y']],
   [44,'C[L+1,M]=1'                      ,['mov','w','C','+','L',1,'M',1]],
   [46,' then'                           ,['cnj',47,50]],
-  [47,'C[K+1,M]=1'                      ,['mov','w','C','+','K',1,'M',1]],
-  [48,'else'                            ,['jmp',50]],
+  [47,'C[K+1,M]=1 '                      ,['mov','w','C','+','K',1,'M',1]],
+  [48,'else '                            ,['jmp',50]],
   [49,'C[K+1,M]=0<br>'                  ,['mov','w','C','+','K',1,'M',0]],
   [50,'     next<br>'                   ,['lpo']],
   [51,'     L=0<br>'                    ,['mov','L',0]],
@@ -88,7 +132,7 @@ var list=[
   [58,'     B[G,P]=B[G-J,P]<br>'        ,['mov','w','B','G','P','r','B','-','G','J','P']],
   [59,'     if'                         ,['nop']],
   [60,' C[O,P]=1'                       ,['mov','X','==','r','C','O','P',1]],
-  [61,' then'                           ,['cnj','X',62,63]],
+  [61,' then '                           ,['cnj','X',62,63]],
   [62,'B[G,P]=B[G,P]+D[P]<br>'          ,['mov','w','B','G','P','+','r','G','P','r','D',0]],
   [63,'    next<br>'                    ,['lpo']],
   [64,'    G=G+1<br>'                   ,['mov','G','+','G',1]],
@@ -101,3 +145,4 @@ var list=[
   [71,'next<br>'                        ,['lpo']],
   [72,'print A<br>'                     ,['prn','A']]
 ];
+var cmds=list.length;
