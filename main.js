@@ -25,7 +25,10 @@ var pc2cmd=function(_pc){
 };
 
 var step1=function(){
-  //find cmd at pc pc
+  //interpret
+  var pcci=pc2cmd(pc);
+  interpret(list[pcci][2]);
+  //next
   pc++;
   var pcci=pc2cmd(pc);
   if(pcci!=null){
@@ -42,6 +45,29 @@ var hilight=function(_ci){
   document.getElementById('cmd'+_ci).style="color:white;background-color:red";
   for(ci=_ci+1;ci<cmds;ci++){
     document.getElementById('cmd'+ci).style="";
+  }
+};
+
+var interpret=function(_asm){
+  var asm=_asm.clone();
+  while(asm.length>0){
+    var opr=asm.shift();
+    switch(opr){
+      case 'mov':
+        var opd=asm.shift(); // dst = A-Z or w
+        var dst;
+        var dstx;
+        var dsty;
+        if(opd.match(/[A-Z]/)!=null){
+          dst  = opd.charCodeAt(0)-opd.charCodeAt('A');
+          dstx = 0;
+          dsty = 0;
+        }else if(dst=='w'){
+          opd  = asm.shift(); // A-Z
+          dst  = opd.charCodeAt(0)-opd.charCodeAt('A');
+        }
+      break;
+    }
   }
 };
 
